@@ -1,4 +1,7 @@
 import scala.io
+import scala.util.Try
+import scala.util.Failure
+import scala.util.Success
 import org.openqa.selenium.chrome._
 import com.deque.html.axecore.selenium._
 
@@ -17,7 +20,33 @@ object sample {
     )
 
     print("Enter URL: ")
-    webDriver.get(io.StdIn.readLine)
+    analyze(io.StdIn.readLine, webDriver) match {
+      case Success((Some(violations), Some(incomplete))) =>
+        println(
+          s"***** Violations *****\n\n$violations\n\n***** Incomplete *****\n\n$incomplete"
+        )
+      case Success((Some(violations), None)) =>
+        println(
+          s"***** Violations *****\n\n$violations\n\nIncomplete was not detected."
+        )
+      case Success((None, Some(incomplete))) =>
+        println(
+          s"Violations was not detected.\n\n***** Incomplete *****\n\n$incomplete"
+        )
+      case Success((None, None)) => println("Violations and Incomplete were not detected.")
+      case Failure(exception)    => println(exception)
+    }
+
+    webDriver.close
+    webDriver.quit
+  }
+
+  def analyze(
+      url: String,
+      webDriver: ChromeDriver
+  ): Try[(Option[String], Option[String])] = Try {
+
+    webDriver.get(url)
 
     val result = new AxeBuilder()
       .withTags(
@@ -30,29 +59,29 @@ object sample {
           "best-practice"
         )
       )
+      .withoutIframeSandboxes()
       .analyze(webDriver)
 
-    val Violations =
+    val violations =
       if (
         AxeReporter.getReadableAxeResults(
           "analyze",
           webDriver,
           result.getViolations
         )
-      ) "***** Violations *****\n\n" + AxeReporter.getAxeResultString
+      ) Some(AxeReporter.getAxeResultString)
+      else None
 
-    val Incomplete =
+    val incomplete =
       if (
         AxeReporter.getReadableAxeResults(
           "analyze",
           webDriver,
           result.getIncomplete
         )
-      ) "***** Incomplete *****\n\n" + AxeReporter.getAxeResultString
+      ) Some(AxeReporter.getAxeResultString)
+      else None
 
-    println(s"$Violations\n\n$Incomplete")
-
-    webDriver.close
-    webDriver.quit
+    (violations, incomplete)
   }
 }
