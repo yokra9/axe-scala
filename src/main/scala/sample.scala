@@ -14,6 +14,7 @@ object sample {
       new ChromeOptions().addArguments(
         "--headless",
         "--disable-gpu",
+        "--no-sandbox",
         "--window-size=1920,1200",
         "--ignore-certificate-errors"
       )
