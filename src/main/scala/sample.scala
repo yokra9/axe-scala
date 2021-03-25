@@ -1,7 +1,4 @@
-import scala.io
-import scala.util.Try
-import scala.util.Failure
-import scala.util.Success
+import scala.util.{Try, Failure, Success}
 import org.openqa.selenium.chrome._
 import com.deque.html.axecore.selenium._
 
@@ -21,7 +18,7 @@ object sample {
     )
 
     print("Enter URL: ")
-    analyze(io.StdIn.readLine, webDriver) match {
+    analyze(scala.io.StdIn.readLine, webDriver) match {
       case Success((Some(violations), Some(incomplete))) =>
         println(
           s"***** Violations *****\n\n$violations\n\n***** Incomplete *****\n\n$incomplete"
@@ -34,8 +31,9 @@ object sample {
         println(
           s"Violations was not detected.\n\n***** Incomplete *****\n\n$incomplete"
         )
-      case Success((None, None)) => println("Violations and Incomplete were not detected.")
-      case Failure(exception)    => println(exception)
+      case Success((None, None)) =>
+        println("Violations and Incomplete were not detected.")
+      case Failure(exception) => println(exception)
     }
 
     webDriver.close
