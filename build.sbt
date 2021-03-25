@@ -26,7 +26,9 @@ dockerCommands ++= Seq(
     wget https://chromedriver.storage.googleapis.com/$(curl https://chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip && \
     unzip chromedriver_linux64.zip -d /bin/ && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*"""
+    rm -rf /var/lib/apt/lists/* && \
+    rm -f google-chrome-stable_current_amd64.deb && \
+    rm -f chromedriver_linux64.zip"""
   ),
   Cmd("USER", "1001:0"),
 )
